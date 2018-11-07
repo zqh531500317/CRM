@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zqh.crm.mapper.CustomerMapper">
+    <sql id="select">
+        SELECT c.id as cid,
+               c.cus_name,
+               c.cus_address,
+               c.cus_dest,
+               c.cus_email,
+               c.cus_mobile,
+               c.cus_phone,
+               c.cus_rank,
+               c.cus_dest,
+               c.cus_rank,
+               l.id as lid,
+               l.lm_name,
+               l.lm_file,
+               l.lm_mobile,
+               l.lm_phone,
+               l.lm_sex
+
+        FROM customer as c
+                 LEFT JOIN linkman as l on c.id = l.cus_id
+
+    </sql>
+    <resultMap id="customerMap" type="customer">
+        <id property="id" column="cid"/>
+        <result property="cus_name" column="cus_name"/>
+        <result property="cus_phone" column="cus_phone"/>
+        <result property="cus_address" column="cus_address"/>
+        <result property="cus_mobile" column="cus_mobile"/>
+        <result property="cus_dest" column="cus_dest"/>
+        <result property="cus_rank" column="cus_rank"/>
+        <collection property="linkManList" ofType="com.zqh.crm.pojo.LinkMan">
+            <id property="id" column="lid"/>
+            <result property="lm_name" column="lm_name"/>
+            <result property="lm_sex" column="lm_sex"/>
+            <result property="lm_phone" column="lm_phone"/>
+            <result property="lm_mobile" column="lm_mobile"/>
+            <result property="lm_file" column="lm_file"/>
+        </collection>
+    </resultMap>
+    <select id="getCustomerById" parameterType="int" resultMap="customerMap">
+
+        <include refid="select"/>
+        WHERE c.id = #{id}
+    </select>
+    <select id="getCustomerByName" parameterType="string" resultMap="customerMap">
+        <include refid="select"/>
+        where c.cus_name like concat('%','${value}','%')
+    </select>
+    <select id="getCustomerByCustomer" parameterType="customer" resultMap="customerMap">
+        <include refid="select"/>
+        <where>
+            <if test="cus_name!=null and cus_name!=''">
+                and c.cus_name like concat('%','${cus_name}','%')
+            </if>
+            <if test="cus_dest!=null and cus_dest!=''">
+                and c.cus_dest =#{cus_dest}
+            </if>
+            <if test="cus_rank!=null and cus_rank!=''">
+                and c.cus_rank =#{cus_rank}
+            </if>
+        </where>
+    </select>
+    <select id="find" resultMap="customerMap">
+        <include refid="select"/>
+    </select>
+    <insert id="insert" parameterType="customer">
+        <selectKey resultType="int" order="AFTER" keyProperty="id">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into customer (cus_name, cus_dest, cus_phone, cus_address, cus_rank, cus_mobile, cus_email)
+        VALUES (#{cus_name}, #{cus_dest}, #{cus_phone}, #{cus_address}, #{cus_rank}, #{cus_mobile}, #{cus_email})
+    </insert>
+    <delete id="deleteById" parameterType="customer">
+        delete
+        from customer
+        where id = #{id}
+    </delete>
+    <update id="updateByCustomer" parameterType="customer">
+        update customer
+        set cus_name    = #{cus_name},
+            cus_dest    = #{cus_dest},
+            cus_phone   = #{cus_phone},
+            cus_address = #{cus_address},
+            cus_rank    = #{cus_rank},
+            cus_mobile  = #{cus_mobile},
+            cus_email   = #{cus_email}
+        where id = #{id}
+    </update>
+    <select id="getTotalNum" parameterType="QueryVo" resultType="int">
+        select count(*)
+        from customer
+        <where>
+            <if test="cus_name!=null and cus_name!=''">
+                and cus_name like concat('%','${cus_name}','%')
+            </if>
+            <if test="cus_dest!=null and cus_dest!=''">
+                and cus_dest=#{cus_dest}
+            </if>
+            <if test="cus_rank!=null and cus_rank!=''">
+                and cus_rank=#{cus_rank}
+            </if>
+        </where>
+    </select>
+    <select id="getCustomerByQueryVo" parameterType="QueryVo" resultMap="customerMap">
+        <include refid="select"/>
+        WHERE c.id in
+        (select X.id from
+        (select id from customer
+        <where>
+            <if test="cus_name!=null and cus_name!=''">
+                and cus_name like concat('%','${cus_name}','%')
+            </if>
+            <if test="cus_dest!=null and cus_dest!=''">
+                and cus_dest=#{cus_dest}
+            </if>
+            <if test="cus_rank!=null and cus_rank!=''">
+                and cus_rank=#{cus_rank}
+            </if>
+        </where>
+        limit #{start},#{size}
+        ) as X
+        )
+        ORDER BY c.id
+    </select>
+    <select id="getCountGroupByRank" resultType="com.zqh.crm.utils.EchartsUtil.Count">
+        SELECT y.cus_rank name, IFNULL(num, 0) value
+        FROM (SELECT b.`value` as cus_rank FROM base_dir b WHERE b.type_id = 1) y
+                 LEFT JOIN (SELECT cus_rank, count(1) as num FROM customer GROUP BY cus_rank) t
+                     on y.cus_rank = t.cus_rank
+    </select>
+    <select id="getCountGroupByDest" resultType="com.zqh.crm.utils.EchartsUtil.Count">
+        SELECT y.cus_dest name, IFNULL(num, 0) value
+        FROM (SELECT b.`value` as cus_dest FROM base_dir b WHERE b.type_id = 2) y
+                 LEFT JOIN (SELECT cus_dest, count(1) as num FROM customer GROUP BY cus_dest) t
+                     on y.cus_dest = t.cus_dest
+    </select>
+</mapper>

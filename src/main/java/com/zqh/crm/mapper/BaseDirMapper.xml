@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zqh.crm.mapper.BaseDirMapper">
+    <select id="findByTypeId" parameterType="int" resultType="BaseDir">
+        select `id`,`type_id`,`type_name`,`value`,`enable`
+        from base_dir
+        where type_id=#{type_id}
+    </select>
+    <select id="findByTypeName" parameterType="string" resultType="BaseDir">
+        select `id`,`type_id`,`type_name`,`value`,`enable`
+        from base_dir
+        where type_name=#{type_name}
+    </select>
+    <select id="findByValue" parameterType="string" resultType="BaseDir">
+        select `id`,`type_id`,`type_name`,`value`,`enable`
+        from base_dir
+        where `value`=#{value}
+    </select>
+</mapper>

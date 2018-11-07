@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zqh.crm.mapper.VisitMapper">
+    <insert id="insert" parameterType="visit">
+        insert into visit (cus_id, lm_id, address, `date`)
+        VALUES (#{cus_id}, #{lm_id}, #{address}, #{date})
+    </insert>
+    <select id="selectAll" resultType="visit">
+        select c.cus_name, l.lm_name, v.address, v.`date`
+        from visit v
+                 join linkman l on v.lm_id = l.id
+                 join customer c on v.cus_id = c.id
+    </select>
+</mapper>

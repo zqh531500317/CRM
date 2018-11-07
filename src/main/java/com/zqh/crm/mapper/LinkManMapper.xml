@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zqh.crm.mapper.LinkManMapper">
+    <update id="updateByLinkMan" parameterType="linkMan">
+        UPDATE linkman
+        <trim prefix="set" suffixOverrides=",">
+            <if test="lm_sex!=null and lm_sex!=''">
+                lm_sex = #{lm_sex},
+            </if>
+            <if test="lm_phone!=null and lm_phone!=''">
+                lm_phone = #{lm_phone},
+            </if>
+            <if test="lm_mobile!=null and lm_mobile!=''">
+                lm_mobile = #{lm_mobile},
+            </if>
+            <if test="cus_id!=null and cus_id!=''">
+                cus_id = #{cus_id},
+            </if>
+            <if test="lm_file!=null and lm_file!=''">
+                lm_file = #{lm_file},
+            </if>
+        </trim>
+        WHERE id = #{id}
+    </update>
+    <update id="updateIdByLinkMan" parameterType="linkMan">
+        update linkman
+        set cus_id = #{cus_id}
+        where lm_name = #{lm_name}
+    </update>
+    <resultMap id="selectLinkMan" type="linkman">
+        <id property="id" column="lid"/>
+        <result property="lm_name" column="lm_name"/>
+        <result property="lm_sex" column="lm_sex"/>
+        <result property="lm_phone" column="lm_phone"/>
+        <result property="lm_mobile" column="lm_mobile"/>
+        <result property="lm_file" column="lm_file"/>
+        <result property="cus_id" column="cus_id"/>
+        <result property="cus_name" column="cus_name"/>
+    </resultMap>
+    <select id="getLinkManList" resultMap="selectLinkMan">
+        SELECT l.id as lid, l.lm_name, l.lm_phone, l.lm_mobile, l.lm_file, l.cus_id, c.cus_name,l.lm_sex
+        FROM linkman l
+                 LEFT JOIN customer c on l.cus_id = c.id
+    </select>
+    <select id="getLinkManById" parameterType="int" resultMap="selectLinkMan">
+        SELECT l.id as lid, l.lm_name, l.lm_phone, l.lm_mobile, l.lm_file, l.cus_id, c.cus_name,l.lm_sex
+        FROM linkman l
+                 LEFT JOIN customer c on l.cus_id = c.id
+        where l.id=#{id}
+    </select>
+    <delete id="deleteLinkManById" parameterType="int">
+        delete
+        from linkman
+        where id = #{id}
+    </delete>
+    <insert id="insertLinkManByLinkMan" parameterType="linkman">
+        <selectKey resultType="int" order="AFTER" keyProperty="id">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into linkman
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="lm_name != null and lm_name!=''">
+                lm_name,
+            </if>
+            <if test="lm_sex != null and lm_sex!=''">
+                lm_sex,
+            </if>
+            <if test="lm_phone != null and lm_phone!=''">
+                lm_phone,
+            </if>
+            <if test="lm_mobile != null and lm_mobile!=''">
+                lm_mobile,
+            </if>
+            <if test="cus_id != null and cus_id!=''">
+                cus_id,
+            </if>
+            <if test="lm_file != null and lm_file!=''">
+                lm_file,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="lm_name != null and lm_name!=''">
+                #{lm_name},
+            </if>
+            <if test="lm_sex != null and lm_sex!=''">
+                #{lm_sex},
+            </if>
+            <if test="lm_phone != null and lm_phone!=''">
+                #{lm_phone},
+            </if>
+            <if test="lm_mobile != null and lm_mobile!=''">
+                #{lm_mobile},
+            </if>
+            <if test="cus_id != null and cus_id!=''">
+                #{cus_id},
+            </if>
+            <if test="lm_file != null and lm_file!=''">
+                #{lm_file},
+            </if>
+        </trim>
+    </insert>
+
+</mapper>
