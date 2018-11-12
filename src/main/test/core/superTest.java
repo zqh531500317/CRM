@@ -8,7 +8,12 @@ public class superTest {
     protected ApplicationContext applicationContext;
     @Before
     public void init() {
-        applicationContext = new ClassPathXmlApplicationContext("classpath:spring/applicationContext-dao.xml","classpath:spring/applicationContext-service.xml");
+        /*applicationContext = new ClassPathXmlApplicationContext(
+                "classpath:spring/applicationContext-dao.xml",
+                "classpath:spring/applicationContext-service.xml",
+                "classpath:spring/applicationContext-redis.xml");*/
+        applicationContext = new ClassPathXmlApplicationContext(
+                "classpath:spring/*.xml");
     }
 
 }

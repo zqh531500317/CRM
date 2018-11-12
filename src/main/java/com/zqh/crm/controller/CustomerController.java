@@ -30,8 +30,8 @@ public class CustomerController {
 
     @RequestMapping("/addView")
     public String customer_addView(Model model) throws Exception {
-        List<BaseDir> cus_rank = baseDirService.findByTypeName("客户级别");
-        List<BaseDir> cus_dest = baseDirService.findByTypeName("信息来源");
+        List<BaseDir> cus_rank = baseDirService.findByTypeId(1);
+        List<BaseDir> cus_dest = baseDirService.findByTypeId(2);
 
         model.addAttribute("cus_rank", cus_rank);
         model.addAttribute("cus_dest", cus_dest);
@@ -74,9 +74,9 @@ public class CustomerController {
      * 1     客户级别
      * 2     信息来源
      */
+    @ResponseBody
     @RequestMapping("/cus_dir")
-    public @ResponseBody
-    List<BaseDir> cus_dir(Integer id) throws Exception {
+    public List<BaseDir> cus_dir(Integer id) throws Exception {
         System.out.println(id);
         List<BaseDir> list = baseDirService.findByTypeId(id);
         return list;
@@ -122,8 +122,8 @@ public class CustomerController {
             model.addAttribute("info", "该客户不存在");
             return "customer/cus_manage";
         }
-        List<BaseDir> cus_rank = baseDirService.findByTypeName("客户级别");
-        List<BaseDir> cus_dest = baseDirService.findByTypeName("信息来源");
+        List<BaseDir> cus_rank = baseDirService.findByTypeId(1);
+        List<BaseDir> cus_dest = baseDirService.findByTypeId(2);
 
         model.addAttribute("cus_rank", cus_rank);
         model.addAttribute("cus_dest", cus_dest);

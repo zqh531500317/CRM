@@ -5,6 +5,7 @@ import com.zqh.crm.mapper.BaseDirMapper;
 import com.zqh.crm.pojo.BaseDir;
 import com.zqh.crm.service.BaseDirService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,42 +16,38 @@ import java.util.List;
 public class BaseDirServiceImpl implements BaseDirService {
     @Autowired
     private BaseDirMapper baseDirMapper;
+    @Autowired
+    private RedisTemplate<String, BaseDir> redisTemplate;
 
     @Override
     public List<BaseDir> findByTypeId(int type_id) throws Exception {
+        //先在redis中寻找
+        List<BaseDir> l = redisTemplate.opsForList().range("baseDir:" + type_id, 0, -1);
+        if (l.size()!=0)
+            return l;
+        //在数据库中找
         List<BaseDir> list = baseDirMapper.findByTypeId(type_id);
         //移除enable=false的
         list = removeEnable(list);
+        //存入redis
+        redisTemplate.opsForList().rightPushAll("baseDir:"+type_id,list);
         return list;
     }
 
-    @Override
-    public List<BaseDir> findByTypeName(String type_name) throws Exception {
-        List<BaseDir> list =baseDirMapper.findByTypeName(type_name);
-        //移除enable=false的
-        list = removeEnable(list);
-        return list;
-    }
 
-    @Override
-    public BaseDir findByValue(String value) throws Exception {
-        BaseDir baseDir =baseDirMapper.findByValue(value);
-        //移除enable=false的
-        baseDir = removeEnable(baseDir);
-        return baseDir;
-    }
-    private List<BaseDir> removeEnable(List<BaseDir> list){
+    private List<BaseDir> removeEnable(List<BaseDir> list) {
         for (BaseDir baseDir : list) {
-            if(!baseDir.getEnable()){
+            if (!baseDir.getEnable()) {
                 list.remove(baseDir);
             }
         }
         return list;
     }
-    private BaseDir removeEnable(BaseDir baseDir){
-            if(!baseDir.getEnable()){
-                return null;
-            }
+
+    private BaseDir removeEnable(BaseDir baseDir) {
+        if (!baseDir.getEnable()) {
+            return null;
+        }
 
         return baseDir;
     }
